@@ -18,6 +18,7 @@ public class PdvpostocombustivelApplication {
                 .run(args);
 
         SwingUtilities.invokeLater(() -> {
+            // Inicia a nova tela principal do menu
             JFrame frame = new TelaPrincipal();
             frame.setVisible(true);
         });

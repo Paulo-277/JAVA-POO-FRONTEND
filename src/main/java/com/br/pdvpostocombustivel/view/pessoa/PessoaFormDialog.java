@@ -1,4 +1,4 @@
-package com.br.pdvpostocombustivel.view;
+package com.br.pdvpostocombustivel.view.pessoa;
 
 import com.br.pdvpostocombustivel.model.Pessoa;
 import com.br.pdvpostocombustivel.enums.TipoPessoa;
