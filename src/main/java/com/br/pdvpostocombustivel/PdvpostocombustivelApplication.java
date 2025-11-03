@@ -1,6 +1,5 @@
 package com.br.pdvpostocombustivel;
 
-import com.br.pdvpostocombustivel.view.TelaPrincipal;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
