@@ -1,5 +1,6 @@
 package com.br.pdvpostocombustivel;
 
+import com.br.pdvpostocombustivel.view.TelaPrincipal;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -11,14 +12,14 @@ import javax.swing.*;
 public class PdvpostocombustivelApplication {
 
     public static void main(String[] args) {
-        var context = new SpringApplicationBuilder(PdvpostocombustivelApplication.class)
+        new SpringApplicationBuilder(PdvpostocombustivelApplication.class)
                 .headless(false)
                 .web(WebApplicationType.NONE)
                 .run(args);
 
         SwingUtilities.invokeLater(() -> {
             // Inicia a nova tela principal do menu
-            JFrame frame = new TelaPrincipal();
+            TelaPrincipal frame = new TelaPrincipal();
             frame.setVisible(true);
         });
     }
