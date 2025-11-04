@@ -1,4 +1,4 @@
-package com.br.pdvpostocombustivel.model;
+package com.br.pdvpostocombustivel.model.preco;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

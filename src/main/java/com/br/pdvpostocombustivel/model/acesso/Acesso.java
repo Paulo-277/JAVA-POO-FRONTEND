@@ -1,4 +1,4 @@
-package com.br.pdvpostocombustivel.model;
+package com.br.pdvpostocombustivel.model.acesso;
 
 public class Acesso {
 

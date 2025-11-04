@@ -1,4 +1,4 @@
-package com.br.pdvpostocombustivel.model;
+package com.br.pdvpostocombustivel.model.produto;
 
 public class Produto {
 

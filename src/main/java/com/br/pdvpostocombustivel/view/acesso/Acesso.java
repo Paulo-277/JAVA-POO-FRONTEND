@@ -1,16 +1,23 @@
 package com.br.pdvpostocombustivel.view.acesso;
 
+import com.br.pdvpostocombustivel.model.acesso.AcessoRequest;
+import com.br.pdvpostocombustivel.services.AcessoService;
+import org.springframework.stereotype.Component;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+@Component
 public class Acesso {
     private JPanel acessoPanel;
     private JTable tAcesso;
     private JButton addBut;
     private JButton editBut;
     private JButton apagBut;
+    private final AcessoService acessoService;
 
-    public Acesso() {
+    public Acesso(AcessoService acessoService) {
+        this.acessoService = acessoService;
         initComponents();
 
         addBut.addActionListener(e -> {
@@ -36,7 +43,9 @@ public class Acesso {
             int confirm = JOptionPane.showConfirmDialog(acessoPanel, "Tem certeza que deseja excluir o acesso selecionado?", "Excluir Acesso", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 DefaultTableModel model = (DefaultTableModel) tAcesso.getModel();
-                model.removeRow(selectedRow);
+                Long id = (Long) model.getValueAt(selectedRow, 0);
+                acessoService.deleteAcesso(id);
+                refreshTable();
             }
         });
     }
@@ -46,16 +55,21 @@ public class Acesso {
         model.addColumn("ID");
         model.addColumn("Usuário");
         model.addColumn("Senha");
-
-        model.addRow(new Object[]{1L, "admin", "admin123"});
-        model.addRow(new Object[]{2L, "user", "user123"});
-
         tAcesso.setModel(model);
+        refreshTable();
+    }
+
+    private void refreshTable() {
+        DefaultTableModel model = (DefaultTableModel) tAcesso.getModel();
+        model.setRowCount(0); // Limpa a tabela
+        acessoService.getAllAcessos().forEach(acesso -> {
+            model.addRow(new Object[]{acesso.id(), acesso.usuario(), acesso.senha()});
+        });
     }
 
     private void showAcessoDialog(Integer selectedRow) {
         JTextField usuarioField = new JTextField(20);
-        JTextField senhaField = new JTextField(20);
+        JPasswordField senhaField = new JPasswordField(20);
 
         JPanel myPanel = new JPanel();
         myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.Y_AXIS));
@@ -71,7 +85,7 @@ public class Acesso {
         if (selectedRow != null) {
             title = "Editar Acesso";
             usuarioField.setText((String) model.getValueAt(selectedRow, 1));
-            senhaField.setText((String) model.getValueAt(selectedRow, 2));
+            // A senha não é preenchida por segurança
         } else {
             title = "Adicionar Acesso";
         }
@@ -79,15 +93,14 @@ public class Acesso {
         int result = JOptionPane.showConfirmDialog(null, myPanel, title, JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String usuario = usuarioField.getText();
-            String senha = senhaField.getText();
+            String senha = new String(senhaField.getPassword());
 
             if (usuario != null && !usuario.trim().isEmpty() && senha != null && !senha.trim().isEmpty()) {
                 if (selectedRow != null) {
-                    model.setValueAt(usuario, selectedRow, 1);
-                    model.setValueAt(senha, selectedRow, 2);
+                    // TODO: Implementar a edição no backend
                 } else {
-                    long newId = model.getRowCount() > 0 ? (long) model.getValueAt(model.getRowCount() - 1, 0) + 1 : 1L;
-                    model.addRow(new Object[]{newId, usuario, senha});
+                    acessoService.createAcesso(new AcessoRequest(usuario, senha));
+                    refreshTable();
                 }
             } else {
                 JOptionPane.showMessageDialog(acessoPanel, "Usuário e Senha não podem ser vazios.", "Erro", JOptionPane.ERROR_MESSAGE);

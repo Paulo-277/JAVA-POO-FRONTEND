@@ -5,6 +5,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.swing.*;
 
@@ -12,14 +13,13 @@ import javax.swing.*;
 public class PdvpostocombustivelApplication {
 
     public static void main(String[] args) {
-        new SpringApplicationBuilder(PdvpostocombustivelApplication.class)
+        ConfigurableApplicationContext context = new SpringApplicationBuilder(PdvpostocombustivelApplication.class)
                 .headless(false)
                 .web(WebApplicationType.NONE)
                 .run(args);
 
         SwingUtilities.invokeLater(() -> {
-            // Inicia a nova tela principal do menu
-            TelaPrincipal frame = new TelaPrincipal();
+            TelaPrincipal frame = context.getBean(TelaPrincipal.class);
             frame.setVisible(true);
         });
     }
