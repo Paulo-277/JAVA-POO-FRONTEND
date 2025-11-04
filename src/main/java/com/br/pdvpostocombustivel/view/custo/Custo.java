@@ -1,19 +1,26 @@
 package com.br.pdvpostocombustivel.view.custo;
 
+import com.br.pdvpostocombustivel.model.custo.CustoRequest;
+import com.br.pdvpostocombustivel.services.CustoService;
+import org.springframework.stereotype.Component;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+@Component
 public class Custo {
     private JPanel panel1;
     private JTable tCusto;
     private JButton EDITARButton;
     private JButton EXCLUIRButton;
     private JButton ADICIONARButton;
+    private final CustoService custoService;
 
-    public Custo() {
+    public Custo(CustoService custoService) {
+        this.custoService = custoService;
         initComponents();
 
         ADICIONARButton.addActionListener(e -> {
@@ -39,7 +46,9 @@ public class Custo {
             int confirm = JOptionPane.showConfirmDialog(panel1, "Tem certeza que deseja excluir o custo selecionado?", "Excluir Custo", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 DefaultTableModel model = (DefaultTableModel) tCusto.getModel();
-                model.removeRow(selectedRow);
+                Long id = (Long) model.getValueAt(selectedRow, 0);
+                custoService.deleteCusto(id);
+                refreshTable();
             }
         });
     }
@@ -52,11 +61,16 @@ public class Custo {
         model.addColumn("Custo Fixo");
         model.addColumn("Margem de Lucro");
         model.addColumn("Data de Processamento");
-
-        model.addRow(new Object[]{1L, new BigDecimal("0.10"), new BigDecimal("1.50"), new BigDecimal("1000.00"), new BigDecimal("0.20"), LocalDate.now()});
-        model.addRow(new Object[]{2L, new BigDecimal("0.12"), new BigDecimal("1.60"), new BigDecimal("1200.00"), new BigDecimal("0.22"), LocalDate.now()});
-
         tCusto.setModel(model);
+        refreshTable();
+    }
+
+    private void refreshTable() {
+        DefaultTableModel model = (DefaultTableModel) tCusto.getModel();
+        model.setRowCount(0); // Limpa a tabela
+        custoService.getAllCustos().forEach(custo -> {
+            model.addRow(new Object[]{custo.id(), custo.imposto(), custo.custoVariavel(), custo.custoFixo(), custo.margemLucro(), custo.dataProcessamento()});
+        });
     }
 
     private void showCustoDialog(Integer selectedRow) {
@@ -107,15 +121,12 @@ public class Custo {
                 LocalDate dataProcessamento = LocalDate.parse(dataProcessamentoField.getText(), DateTimeFormatter.ISO_LOCAL_DATE);
 
                 if (selectedRow != null) {
-                    model.setValueAt(imposto, selectedRow, 1);
-                    model.setValueAt(custoVariavel, selectedRow, 2);
-                    model.setValueAt(custoFixo, selectedRow, 3);
-                    model.setValueAt(margemLucro, selectedRow, 4);
-                    model.setValueAt(dataProcessamento, selectedRow, 5);
+                    Long id = (Long) model.getValueAt(selectedRow, 0);
+                    custoService.updateCusto(id, new CustoRequest(imposto, custoVariavel, custoFixo, margemLucro, dataProcessamento));
                 } else {
-                    long newId = model.getRowCount() > 0 ? (long) model.getValueAt(model.getRowCount() - 1, 0) + 1 : 1L;
-                    model.addRow(new Object[]{newId, imposto, custoVariavel, custoFixo, margemLucro, dataProcessamento});
+                    custoService.createCusto(new CustoRequest(imposto, custoVariavel, custoFixo, margemLucro, dataProcessamento));
                 }
+                refreshTable();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(panel1, "Erro ao converter os valores. Verifique o formato dos dados.", "Erro", JOptionPane.ERROR_MESSAGE);
             }

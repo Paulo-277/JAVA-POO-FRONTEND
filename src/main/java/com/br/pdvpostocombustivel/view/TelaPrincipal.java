@@ -64,7 +64,7 @@ public class TelaPrincipal extends JFrame {
 
         seleCusto.addActionListener(e -> {
             JDialog dialog = new JDialog(this, "Custo", true);
-            Custo custoPanel = new Custo(); // Still direct instantiation
+            Custo custoPanel = context.getBean(Custo.class);
             dialog.setContentPane(custoPanel.getCustoPanel());
             dialog.pack();
             dialog.setLocationRelativeTo(this);
@@ -73,7 +73,7 @@ public class TelaPrincipal extends JFrame {
 
         selePessoa.addActionListener(e -> {
             JDialog dialog = new JDialog(this, "Pessoa", true);
-            Pessoa pessoaPanel = new Pessoa(); // Still direct instantiation
+            Pessoa pessoaPanel = context.getBean(Pessoa.class);
             dialog.setContentPane(pessoaPanel.getPessoaPanel());
             dialog.pack();
             dialog.setLocationRelativeTo(this);
@@ -82,7 +82,7 @@ public class TelaPrincipal extends JFrame {
 
         selePreco.addActionListener(e -> {
             JDialog dialog = new JDialog(this, "Preco", true);
-            Preco precoPanel = new Preco(); // Still direct instantiation
+            Preco precoPanel = context.getBean(Preco.class);
             dialog.setContentPane(precoPanel.getPrecoPanel());
             dialog.pack();
             dialog.setLocationRelativeTo(this);
@@ -91,7 +91,7 @@ public class TelaPrincipal extends JFrame {
 
         seleProduto.addActionListener(e -> {
             JDialog dialog = new JDialog(this, "Produto", true);
-            Produto produtoPanel = new Produto(); // Still direct instantiation
+            Produto produtoPanel = context.getBean(Produto.class);
             dialog.setContentPane(produtoPanel.getProdutoPanel());
             dialog.pack();
             dialog.setLocationRelativeTo(this);
