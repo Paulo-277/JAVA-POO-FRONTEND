@@ -95,15 +95,16 @@ public class Acesso {
             String usuario = usuarioField.getText();
             String senha = new String(senhaField.getPassword());
 
-            if (usuario != null && !usuario.trim().isEmpty() && senha != null && !senha.trim().isEmpty()) {
+            if (usuario != null && !usuario.trim().isEmpty()) {
                 if (selectedRow != null) {
-                    // TODO: Implementar a edição no backend
+                    Long id = (Long) model.getValueAt(selectedRow, 0);
+                    acessoService.updateAcesso(id, new AcessoRequest(usuario, senha));
                 } else {
                     acessoService.createAcesso(new AcessoRequest(usuario, senha));
-                    refreshTable();
                 }
+                refreshTable();
             } else {
-                JOptionPane.showMessageDialog(acessoPanel, "Usuário e Senha não podem ser vazios.", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(acessoPanel, "O nome de usuário não pode ser vazio.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

@@ -46,7 +46,7 @@ public class TelaPrincipal extends JFrame {
 
         seleContato.addActionListener(e -> {
             JDialog dialog = new JDialog(this, "Contato", true);
-            Contato contatoPanel = new Contato(); // Still direct instantiation
+            Contato contatoPanel = context.getBean(Contato.class);
             dialog.setContentPane(contatoPanel.getContatoPanel());
             dialog.pack();
             dialog.setLocationRelativeTo(this);

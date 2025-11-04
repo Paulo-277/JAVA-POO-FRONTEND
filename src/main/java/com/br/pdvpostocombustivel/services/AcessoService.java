@@ -31,6 +31,10 @@ public class AcessoService {
         return restTemplate.postForObject(API_URL, acessoRequest, AcessoResponse.class);
     }
 
+    public void updateAcesso(Long id, AcessoRequest acessoRequest) {
+        restTemplate.put(API_URL + "/" + id, acessoRequest);
+    }
+
     public void deleteAcesso(Long id) {
         restTemplate.delete(API_URL + "/" + id);
     }

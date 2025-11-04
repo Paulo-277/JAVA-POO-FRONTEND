@@ -1,16 +1,23 @@
 package com.br.pdvpostocombustivel.view.contato;
 
+import com.br.pdvpostocombustivel.model.contato.ContatoRequest;
+import com.br.pdvpostocombustivel.services.ContatoService;
+import org.springframework.stereotype.Component;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+@Component
 public class Contato {
     private JPanel panel1;
     private JButton ADICIONARButton;
     private JButton EDITARButton;
     private JButton EXCLUIRButton;
     private JTable tContato;
+    private final ContatoService contatoService;
 
-    public Contato() {
+    public Contato(ContatoService contatoService) {
+        this.contatoService = contatoService;
         initComponents();
 
         ADICIONARButton.addActionListener(e -> {
@@ -36,7 +43,9 @@ public class Contato {
             int confirm = JOptionPane.showConfirmDialog(panel1, "Tem certeza que deseja excluir o contato selecionado?", "Excluir Contato", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 DefaultTableModel model = (DefaultTableModel) tContato.getModel();
-                model.removeRow(selectedRow);
+                Long id = (Long) model.getValueAt(selectedRow, 0);
+                contatoService.deleteContato(id);
+                refreshTable();
             }
         });
     }
@@ -47,11 +56,16 @@ public class Contato {
         model.addColumn("Telefone");
         model.addColumn("Email");
         model.addColumn("Endereço");
-
-        model.addRow(new Object[]{1L, "(11) 99999-9999", "cliente1@email.com", "Rua A, 123"});
-        model.addRow(new Object[]{2L, "(22) 88888-8888", "cliente2@email.com", "Rua B, 456"});
-
         tContato.setModel(model);
+        refreshTable();
+    }
+
+    private void refreshTable() {
+        DefaultTableModel model = (DefaultTableModel) tContato.getModel();
+        model.setRowCount(0); // Limpa a tabela
+        contatoService.getAllContatos().forEach(contato -> {
+            model.addRow(new Object[]{contato.id(), contato.telefone(), contato.email(), contato.endereco()});
+        });
     }
 
     private void showContatoDialog(Integer selectedRow) {
@@ -90,13 +104,12 @@ public class Contato {
 
             if (telefone != null && !telefone.trim().isEmpty() && email != null && !email.trim().isEmpty() && endereco != null && !endereco.trim().isEmpty()) {
                 if (selectedRow != null) {
-                    model.setValueAt(telefone, selectedRow, 1);
-                    model.setValueAt(email, selectedRow, 2);
-                    model.setValueAt(endereco, selectedRow, 3);
+                    Long id = (Long) model.getValueAt(selectedRow, 0);
+                    contatoService.updateContato(id, new ContatoRequest(telefone, email, endereco));
                 } else {
-                    long newId = model.getRowCount() > 0 ? (long) model.getValueAt(model.getRowCount() - 1, 0) + 1 : 1L;
-                    model.addRow(new Object[]{newId, telefone, email, endereco});
+                    contatoService.createContato(new ContatoRequest(telefone, email, endereco));
                 }
+                refreshTable();
             } else {
                 JOptionPane.showMessageDialog(panel1, "Todos os campos devem ser preenchidos.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
