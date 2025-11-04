@@ -55,7 +55,7 @@ public class TelaPrincipal extends JFrame {
 
         seleEstoque.addActionListener(e -> {
             JDialog dialog = new JDialog(this, "Estoque", true);
-            Estoque estoquePanel = new Estoque(); // Still direct instantiation
+            Estoque estoquePanel = context.getBean(Estoque.class);
             dialog.setContentPane(estoquePanel.getEstoquePanel());
             dialog.pack();
             dialog.setLocationRelativeTo(this);

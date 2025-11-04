@@ -1,19 +1,26 @@
 package com.br.pdvpostocombustivel.view.estoque;
 
+import com.br.pdvpostocombustivel.model.estoque.EstoqueRequest;
+import com.br.pdvpostocombustivel.services.EstoqueService;
+import org.springframework.stereotype.Component;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+@Component
 public class Estoque {
     private JPanel panel1;
     private JButton EDITARButton;
     private JButton EXCLUIRButton;
     private JButton ADICIONARButton;
     private JTable tEstoque;
+    private final EstoqueService estoqueService;
 
-    public Estoque() {
+    public Estoque(EstoqueService estoqueService) {
+        this.estoqueService = estoqueService;
         initComponents();
 
         ADICIONARButton.addActionListener(e -> {
@@ -39,7 +46,9 @@ public class Estoque {
             int confirm = JOptionPane.showConfirmDialog(panel1, "Tem certeza que deseja excluir o item selecionado?", "Excluir Item do Estoque", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 DefaultTableModel model = (DefaultTableModel) tEstoque.getModel();
-                model.removeRow(selectedRow);
+                Long id = (Long) model.getValueAt(selectedRow, 0);
+                estoqueService.deleteEstoque(id);
+                refreshTable();
             }
         });
     }
@@ -52,11 +61,16 @@ public class Estoque {
         model.addColumn("Endereço do Local");
         model.addColumn("Lote de Fabricação");
         model.addColumn("Data de Validade");
-
-        model.addRow(new Object[]{1L, new BigDecimal("10000.00"), "Tanque 01", "Posto A", "LOTE001", LocalDate.now().plusMonths(6)});
-        model.addRow(new Object[]{2L, new BigDecimal("15000.00"), "Tanque 02", "Posto A", "LOTE002", LocalDate.now().plusMonths(6)});
-
         tEstoque.setModel(model);
+        refreshTable();
+    }
+
+    private void refreshTable() {
+        DefaultTableModel model = (DefaultTableModel) tEstoque.getModel();
+        model.setRowCount(0); // Limpa a tabela
+        estoqueService.getAllEstoques().forEach(estoque -> {
+            model.addRow(new Object[]{estoque.id(), estoque.quantidade(), estoque.localTanque(), estoque.localEndereco(), estoque.loteFabricacao(), estoque.dataValidade()});
+        });
     }
 
     private void showEstoqueDialog(Integer selectedRow) {
@@ -107,15 +121,12 @@ public class Estoque {
                 LocalDate dataValidade = LocalDate.parse(dataValidadeField.getText(), DateTimeFormatter.ISO_LOCAL_DATE);
 
                 if (selectedRow != null) {
-                    model.setValueAt(quantidade, selectedRow, 1);
-                    model.setValueAt(localTanque, selectedRow, 2);
-                    model.setValueAt(localEndereco, selectedRow, 3);
-                    model.setValueAt(loteFabricacao, selectedRow, 4);
-                    model.setValueAt(dataValidade, selectedRow, 5);
+                    Long id = (Long) model.getValueAt(selectedRow, 0);
+                    estoqueService.updateEstoque(id, new EstoqueRequest(quantidade, localTanque, localEndereco, loteFabricacao, dataValidade));
                 } else {
-                    long newId = model.getRowCount() > 0 ? (long) model.getValueAt(model.getRowCount() - 1, 0) + 1 : 1L;
-                    model.addRow(new Object[]{newId, quantidade, localTanque, localEndereco, loteFabricacao, dataValidade});
+                    estoqueService.createEstoque(new EstoqueRequest(quantidade, localTanque, localEndereco, loteFabricacao, dataValidade));
                 }
+                refreshTable();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(panel1, "Erro ao converter os valores. Verifique o formato dos dados.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
