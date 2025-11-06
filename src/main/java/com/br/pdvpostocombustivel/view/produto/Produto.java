@@ -1,7 +1,12 @@
 package com.br.pdvpostocombustivel.view.produto;
 
+import com.br.pdvpostocombustivel.model.produto.ProdutoRequest;
+import com.br.pdvpostocombustivel.model.produto.ProdutoResponse;
+import com.br.pdvpostocombustivel.services.ProdutoService;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.util.List;
 
 public class Produto {
     private JPanel panel1;
@@ -9,13 +14,14 @@ public class Produto {
     private JButton EXCLUIRButton;
     private JButton ADICIONARButton;
     private JTable tProduto;
+    private final ProdutoService produtoService;
 
     public Produto() {
+        this.produtoService = new ProdutoService();
         initComponents();
+        loadProdutos();
 
-        ADICIONARButton.addActionListener(e -> {
-            showProdutoDialog(null);
-        });
+        ADICIONARButton.addActionListener(e -> showProdutoDialog(null));
 
         EDITARButton.addActionListener(e -> {
             int selectedRow = tProduto.getSelectedRow();
@@ -23,7 +29,8 @@ public class Produto {
                 JOptionPane.showMessageDialog(panel1, "Selecione um produto para editar.", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            showProdutoDialog(selectedRow);
+            Long id = (Long) tProduto.getValueAt(selectedRow, 0);
+            showProdutoDialog(id);
         });
 
         EXCLUIRButton.addActionListener(e -> {
@@ -35,8 +42,13 @@ public class Produto {
 
             int confirm = JOptionPane.showConfirmDialog(panel1, "Tem certeza que deseja excluir o produto selecionado?", "Excluir Produto", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                DefaultTableModel model = (DefaultTableModel) tProduto.getModel();
-                model.removeRow(selectedRow);
+                Long id = (Long) tProduto.getValueAt(selectedRow, 0);
+                try {
+                    produtoService.deleteProduto(id);
+                    loadProdutos();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(panel1, "Erro ao excluir produto: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
     }
@@ -49,14 +61,34 @@ public class Produto {
         model.addColumn("Fornecedor");
         model.addColumn("Categoria");
         model.addColumn("Marca");
-
-        model.addRow(new Object[]{1L, "Gasolina Comum", "GC001", "Petrobras", "Combustível", "Petrobras"});
-        model.addRow(new Object[]{2L, "Óleo Lubrificante", "OL001", "Ipiranga", "Lubrificante", "Ipiranga"});
-
         tProduto.setModel(model);
     }
 
-    private void showProdutoDialog(Integer selectedRow) {
+    private void loadProdutos() {
+        try {
+            List<ProdutoResponse> produtos = produtoService.getAllProdutos();
+            DefaultTableModel model = (DefaultTableModel) tProduto.getModel();
+            model.setRowCount(0); // Clear existing data
+            for (ProdutoResponse produto : produtos) {
+                model.addRow(new Object[]{
+                        produto.id(),
+                        produto.nome(),
+                        produto.referencia(),
+                        produto.fornecedor(),
+                        produto.categoria(),
+                        produto.marca()
+                });
+            }
+        } catch (Exception e) {
+            DefaultTableModel model = (DefaultTableModel) tProduto.getModel();
+            model.setRowCount(0);
+            model.addRow(new Object[]{1L, "Gasolina Comum (mock)", "GC001", "Petrobras", "Combustível", "Petrobras"});
+            model.addRow(new Object[]{2L, "Óleo Lubrificante (mock)", "OL001", "Ipiranga", "Lubrificante", "Ipiranga"});
+            JOptionPane.showMessageDialog(panel1, "Não foi possível carregar os produtos do servidor. Carregando dados mockados.\n" + e.getMessage(), "Erro de Conexão", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void showProdutoDialog(Long produtoId) {
         JTextField nomeField = new JTextField(20);
         JTextField referenciaField = new JTextField(20);
         JTextField fornecedorField = new JTextField(20);
@@ -80,11 +112,12 @@ public class Produto {
         myPanel.add(new JLabel("Marca:"));
         myPanel.add(marcaField);
 
-        DefaultTableModel model = (DefaultTableModel) tProduto.getModel();
         String title;
 
-        if (selectedRow != null) {
+        if (produtoId != null) {
             title = "Editar Produto";
+            int selectedRow = tProduto.getSelectedRow();
+            DefaultTableModel model = (DefaultTableModel) tProduto.getModel();
             nomeField.setText((String) model.getValueAt(selectedRow, 1));
             referenciaField.setText((String) model.getValueAt(selectedRow, 2));
             fornecedorField.setText((String) model.getValueAt(selectedRow, 3));
@@ -102,16 +135,17 @@ public class Produto {
             String categoria = categoriaField.getText();
             String marca = marcaField.getText();
 
-            if (nome != null && !nome.trim().isEmpty() && referencia != null && !referencia.trim().isEmpty() && fornecedor != null && !fornecedor.trim().isEmpty() && categoria != null && !categoria.trim().isEmpty() && marca != null && !marca.trim().isEmpty()) {
-                if (selectedRow != null) {
-                    model.setValueAt(nome, selectedRow, 1);
-                    model.setValueAt(referencia, selectedRow, 2);
-                    model.setValueAt(fornecedor, selectedRow, 3);
-                    model.setValueAt(categoria, selectedRow, 4);
-                    model.setValueAt(marca, selectedRow, 5);
-                } else {
-                    long newId = model.getRowCount() > 0 ? (long) model.getValueAt(model.getRowCount() - 1, 0) + 1 : 1L;
-                    model.addRow(new Object[]{newId, nome, referencia, fornecedor, categoria, marca});
+            if (!nome.trim().isEmpty() && !referencia.trim().isEmpty() && !fornecedor.trim().isEmpty() && !categoria.trim().isEmpty() && !marca.trim().isEmpty()) {
+                ProdutoRequest request = new ProdutoRequest(nome, referencia, fornecedor, categoria, marca);
+                try {
+                    if (produtoId != null) {
+                        produtoService.updateProduto(produtoId, request);
+                    } else {
+                        produtoService.createProduto(request);
+                    }
+                    loadProdutos(); // Refresh table
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(panel1, "Erro ao salvar produto: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 JOptionPane.showMessageDialog(panel1, "Todos os campos devem ser preenchidos.", "Erro", JOptionPane.ERROR_MESSAGE);
