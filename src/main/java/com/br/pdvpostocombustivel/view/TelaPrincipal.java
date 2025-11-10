@@ -4,6 +4,7 @@ import com.br.pdvpostocombustivel.view.acesso.Acesso;
 import com.br.pdvpostocombustivel.view.contato.Contato;
 import com.br.pdvpostocombustivel.view.custo.Custo;
 import com.br.pdvpostocombustivel.view.estoque.Estoque;
+import com.br.pdvpostocombustivel.view.gerenciadorbomba.GerenciadorBombas;
 import com.br.pdvpostocombustivel.view.pessoa.Pessoa;
 import com.br.pdvpostocombustivel.view.preco.Preco;
 import com.br.pdvpostocombustivel.view.produto.Produto;
@@ -93,6 +94,15 @@ public class TelaPrincipal extends JFrame {
             JDialog dialog = new JDialog(this, "Produto", true);
             Produto produtoPanel = new Produto(); // Still direct instantiation
             dialog.setContentPane(produtoPanel.getProdutoPanel());
+            dialog.pack();
+            dialog.setLocationRelativeTo(this);
+            dialog.setVisible(true);
+        });
+
+        SIMULADORDEBOMBASButton.addActionListener(e -> {
+            JDialog dialog = new JDialog(this, "Gerenciador de Bombas", true);
+            GerenciadorBombas gerenciadorBombasPanel = context.getBean(GerenciadorBombas.class);
+            dialog.setContentPane(gerenciadorBombasPanel.getGerenciadorBombasPanel());
             dialog.pack();
             dialog.setLocationRelativeTo(this);
             dialog.setVisible(true);

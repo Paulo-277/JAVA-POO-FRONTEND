@@ -78,7 +78,7 @@
               </model>
             </properties>
           </component>
-          <component id="4d170" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+          <component id="4d170" class="javax.swing.JComboBox" binding="combB2">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -246,7 +246,7 @@
               <text value="Combustível:"/>
             </properties>
           </component>
-          <component id="7cc8" class="javax.swing.JComboBox" default-binding="true">
+          <component id="7cc8" class="javax.swing.JComboBox" binding="combB3">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -398,7 +398,7 @@
               <text value="Combustível:"/>
             </properties>
           </component>
-          <component id="f4570" class="javax.swing.JComboBox" default-binding="true">
+          <component id="f4570" class="javax.swing.JComboBox" binding="combB1">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
