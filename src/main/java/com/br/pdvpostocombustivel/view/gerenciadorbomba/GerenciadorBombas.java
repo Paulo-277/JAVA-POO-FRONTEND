@@ -1,11 +1,15 @@
 package com.br.pdvpostocombustivel.view.gerenciadorbomba;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ItemEvent;
 import java.util.Map;
 
@@ -42,21 +46,24 @@ public class GerenciadorBombas {
             "ETANOL", 3.00
     );
 
-    public GerenciadorBombas() {
+    private final ApplicationContext context;
+
+    public GerenciadorBombas(ApplicationContext context) {
+        this.context = context;
         // Setup for each pump
         setupPump(combB1, quantB1, preçoB1, preçoTotalB1);
         setupPump(combB2, quantB2, preçoB2, preçoTotalB2);
         setupPump(combB3, quantB3, preçoB3, PreçoTotalB3);
 
         // Set initial component states
-        updateComponentsState(statusB1, combB1, quantB1);
-        updateComponentsState(statusB2, combB2, quantB2);
-        updateComponentsState(statusB3, combB3, quantB3);
+        updateComponentsState(statusB1, combB1, quantB1, PagB1);
+        updateComponentsState(statusB2, combB2, quantB2, PagB2);
+        updateComponentsState(statusB3, combB3, quantB3, PagB3);
 
         // Setup button listeners
-        setupButtonListeners(GERARCOMPROVANTEButton, statusB1, combB1, quantB1);
-        setupButtonListeners(EFETUARPAGAMENTOButton, statusB2, combB2, quantB2);
-        setupButtonListeners(INICIARATENDIMENTOButton, statusB3, combB3, quantB3);
+        setupButtonListeners(GERARCOMPROVANTEButton, statusB1, combB1, quantB1, PagB1, preçoTotalB1);
+        setupButtonListeners(EFETUARPAGAMENTOButton, statusB2, combB2, quantB2, PagB2, preçoTotalB2);
+        setupButtonListeners(INICIARATENDIMENTOButton, statusB3, combB3, quantB3, PagB3, PreçoTotalB3);
     }
 
     private void setupPump(JComboBox<String> fuelCombo, JTextField quantityField, JLabel priceLabel, JLabel totalPriceLabel) {
@@ -78,7 +85,7 @@ public class GerenciadorBombas {
         });
     }
 
-    private void setupButtonListeners(JButton button, JLabel statusLabel, JComboBox<String> fuelCombo, JTextField quantityField) {
+    private void setupButtonListeners(JButton button, JLabel statusLabel, JComboBox<String> fuelCombo, JTextField quantityField, JComboBox<String> paymentCombo, JLabel totalPriceLabel) {
         button.addActionListener(e -> {
             String currentStatus = statusLabel.getText();
             String nextStatus = "";
@@ -91,13 +98,34 @@ public class GerenciadorBombas {
                 nextStatus = "CONCLUÍDA";
                 nextButtonText = "GERAR COMPROVANTE";
             } else if ("CONCLUÍDA".equals(currentStatus)) {
+                Comprovante comprovante = context.getBean(Comprovante.class);
+                comprovante.setDados(
+                        (String) fuelCombo.getSelectedItem(),
+                        quantityField.getText(),
+                        totalPriceLabel.getText(),
+                        (String) paymentCombo.getSelectedItem()
+                );
+
+                Window window = SwingUtilities.getWindowAncestor(panel1);
+                JDialog dialog;
+                if (window instanceof Frame) {
+                    dialog = new JDialog((Frame) window, "Comprovante", true);
+                } else {
+                    dialog = new JDialog((Dialog) window, "Comprovante", true);
+                }
+                
+                dialog.setContentPane(comprovante.getComprovantePanel());
+                dialog.pack();
+                dialog.setLocationRelativeTo(panel1);
+                dialog.setVisible(true);
+
                 nextStatus = "INATIVA";
                 nextButtonText = "INICIAR ATENDIMENTO";
             }
 
             statusLabel.setText(nextStatus);
             button.setText(nextButtonText);
-            updateComponentsState(statusLabel, fuelCombo, quantityField);
+            updateComponentsState(statusLabel, fuelCombo, quantityField, paymentCombo);
         });
     }
 
@@ -120,12 +148,14 @@ public class GerenciadorBombas {
         }
     }
 
-    private void updateComponentsState(JLabel statusLabel, JComboBox<String> fuelCombo, JTextField quantityField) {
+    private void updateComponentsState(JLabel statusLabel, JComboBox<String> fuelCombo, JTextField quantityField, JComboBox<String> paymentCombo) {
         String status = statusLabel.getText();
-        boolean isEditable = "ATIVA".equals(status);
+        boolean isFuelEditable = "ATIVA".equals(status);
+        boolean isPaymentEditable = "CONCLUÍDA".equals(status);
 
-        fuelCombo.setEnabled(isEditable);
-        quantityField.setEditable(isEditable);
+        fuelCombo.setEnabled(isFuelEditable);
+        quantityField.setEditable(isFuelEditable);
+        paymentCombo.setEnabled(isPaymentEditable);
 
         switch (status) {
             case "ATIVA":
