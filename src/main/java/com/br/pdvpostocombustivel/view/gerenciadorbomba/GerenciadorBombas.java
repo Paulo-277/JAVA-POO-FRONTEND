@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.util.Map;
 
@@ -42,36 +43,61 @@ public class GerenciadorBombas {
     );
 
     public GerenciadorBombas() {
-        preparaBomba(combB1, quantB1, preçoB1, preçoTotalB1);
-        preparaBomba(combB2, quantB2, preçoB2, preçoTotalB2);
-        preparaBomba(combB3, quantB3, preçoB3, PreçoTotalB3);
+        // Setup for each pump
+        setupPump(combB1, quantB1, preçoB1, preçoTotalB1);
+        setupPump(combB2, quantB2, preçoB2, preçoTotalB2);
+        setupPump(combB3, quantB3, preçoB3, PreçoTotalB3);
+
+        // Set initial component states
+        updateComponentsState(statusB1, combB1, quantB1);
+        updateComponentsState(statusB2, combB2, quantB2);
+        updateComponentsState(statusB3, combB3, quantB3);
+
+        // Setup button listeners
+        setupButtonListeners(GERARCOMPROVANTEButton, statusB1, combB1, quantB1);
+        setupButtonListeners(EFETUARPAGAMENTOButton, statusB2, combB2, quantB2);
+        setupButtonListeners(INICIARATENDIMENTOButton, statusB3, combB3, quantB3);
     }
 
-    private void preparaBomba(JComboBox<String> tipoComb, JTextField quantidadeComb, JLabel precoComb, JLabel precoTotal) {
-        // Arumar valores iniciais
-        precoComb.setText(String.format("R$ %.2f", precosCombustiveis.get("GASOLINA")));
-        precoTotal.setText("R$ 0.00");
-        quantidadeComb.setText("0");
+    private void setupPump(JComboBox<String> fuelCombo, JTextField quantityField, JLabel priceLabel, JLabel totalPriceLabel) {
+        priceLabel.setText(String.format("R$ %.2f", precosCombustiveis.get("GASOLINA")));
+        totalPriceLabel.setText("R$ 0.00");
+        quantityField.setText("0");
 
-        // Preparando a mudança de combustível
-        tipoComb.addItemListener(e -> {
+        fuelCombo.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                updatePrice(tipoComb, precoComb);
-                updateTotalPrice(tipoComb, quantidadeComb, precoTotal);
+                updatePrice(fuelCombo, priceLabel);
+                updateTotalPrice(fuelCombo, quantityField, totalPriceLabel);
             }
         });
 
-        // Preparando a mudança nos campos de texto
-        quantidadeComb.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                updateTotalPrice(tipoComb, quantidadeComb, precoTotal);
+        quantityField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { updateTotalPrice(fuelCombo, quantityField, totalPriceLabel); }
+            public void removeUpdate(DocumentEvent e) { updateTotalPrice(fuelCombo, quantityField, totalPriceLabel); }
+            public void changedUpdate(DocumentEvent e) { updateTotalPrice(fuelCombo, quantityField, totalPriceLabel); }
+        });
+    }
+
+    private void setupButtonListeners(JButton button, JLabel statusLabel, JComboBox<String> fuelCombo, JTextField quantityField) {
+        button.addActionListener(e -> {
+            String currentStatus = statusLabel.getText();
+            String nextStatus = "";
+            String nextButtonText = "";
+
+            if ("INATIVA".equals(currentStatus)) {
+                nextStatus = "ATIVA";
+                nextButtonText = "EFETUAR PAGAMENTO";
+            } else if ("ATIVA".equals(currentStatus)) {
+                nextStatus = "CONCLUÍDA";
+                nextButtonText = "GERAR COMPROVANTE";
+            } else if ("CONCLUÍDA".equals(currentStatus)) {
+                nextStatus = "INATIVA";
+                nextButtonText = "INICIAR ATENDIMENTO";
             }
-            public void removeUpdate(DocumentEvent e) {
-                updateTotalPrice(tipoComb, quantidadeComb, precoTotal);
-            }
-            public void changedUpdate(DocumentEvent e) {
-                updateTotalPrice(tipoComb, quantidadeComb, precoTotal);
-            }
+
+            statusLabel.setText(nextStatus);
+            button.setText(nextButtonText);
+            updateComponentsState(statusLabel, fuelCombo, quantityField);
         });
     }
 
@@ -91,6 +117,26 @@ public class GerenciadorBombas {
             totalPriceLabel.setText(String.format("R$ %.2f", totalPrice));
         } catch (NumberFormatException | NullPointerException ex) {
             totalPriceLabel.setText("R$ 0.00");
+        }
+    }
+
+    private void updateComponentsState(JLabel statusLabel, JComboBox<String> fuelCombo, JTextField quantityField) {
+        String status = statusLabel.getText();
+        boolean isEditable = "ATIVA".equals(status);
+
+        fuelCombo.setEnabled(isEditable);
+        quantityField.setEditable(isEditable);
+
+        switch (status) {
+            case "ATIVA":
+                statusLabel.setForeground(new Color(240, 248, 20)); // Yellow
+                break;
+            case "CONCLUÍDA":
+                statusLabel.setForeground(new Color(29, 186, 26)); // Green
+                break;
+            case "INATIVA":
+                statusLabel.setForeground(new Color(240, 13, 28));
+                break;
         }
     }
 

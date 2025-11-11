@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.br.pdvpostocombustivel.view.gerenciadorbomba.Comprovante">
+  <grid id="27dc6" layout-manager="GridLayoutManager" row-count="11" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="520" height="309"/>
+    </constraints>
+    <properties>
+      <background color="-1713759"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <component id="18b4e" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="20" style="1"/>
+          <foreground color="-15132391"/>
+          <text value="______________________________"/>
+        </properties>
+      </component>
+      <vspacer id="86c60">
+        <constraints>
+          <grid row="4" column="3" row-span="6" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <vspacer id="3447c">
+        <constraints>
+          <grid row="4" column="0" row-span="6" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <component id="2a258" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="20" style="1"/>
+          <foreground color="-15132391"/>
+          <text value="COMPRA"/>
+        </properties>
+      </component>
+      <component id="863ae" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="20" style="1"/>
+          <foreground color="-15132391"/>
+          <text value="VIA DO CLIENTE"/>
+        </properties>
+      </component>
+      <component id="c0e5c" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="4" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <foreground color="-15132391"/>
+          <text value="POSTO PLACEHOLDER          0123456789"/>
+        </properties>
+      </component>
+      <hspacer id="2a204">
+        <constraints>
+          <grid row="3" column="1" row-span="1" col-span="2" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </hspacer>
+      <hspacer id="8746e">
+        <constraints>
+          <grid row="6" column="1" row-span="1" col-span="2" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </hspacer>
+      <component id="b23a8" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="5" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="1"/>
+          <foreground color="-15132391"/>
+          <text value="TICKET"/>
+        </properties>
+      </component>
+      <component id="335b8" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="1"/>
+          <foreground color="-15132391"/>
+          <text value="PRODUTO:"/>
+        </properties>
+      </component>
+      <component id="c4113" class="javax.swing.JLabel" binding="produtoComprado">
+        <constraints>
+          <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="0"/>
+          <foreground color="-15132391"/>
+          <text value="&lt;PRODUTO&gt;"/>
+        </properties>
+      </component>
+      <component id="454bb" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="1"/>
+          <foreground color="-15132391"/>
+          <text value="QUANTIDADE:"/>
+        </properties>
+      </component>
+      <component id="886f8" class="javax.swing.JLabel" binding="quantidadeComprada">
+        <constraints>
+          <grid row="8" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="0"/>
+          <foreground color="-15132391"/>
+          <text value="&lt;QUANTIDADE&gt;"/>
+        </properties>
+      </component>
+      <component id="fd91b" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="1"/>
+          <foreground color="-15132391"/>
+          <text value="PREÇO:"/>
+        </properties>
+      </component>
+      <component id="c7754" class="javax.swing.JLabel" binding="precoCompra">
+        <constraints>
+          <grid row="9" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="0"/>
+          <foreground color="-15132391"/>
+          <text value="&lt;PREÇO&gt;"/>
+        </properties>
+      </component>
+      <component id="42d27" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="1"/>
+          <foreground color="-15132391"/>
+          <text value="FORMA DE PAGAMENTO"/>
+        </properties>
+      </component>
+      <component id="cbc8f" class="javax.swing.JLabel" binding="formaPagamento">
+        <constraints>
+          <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <font size="15" style="0"/>
+          <foreground color="-15132391"/>
+          <text value="&lt;FORMA DE PAGAMENTO&gt;"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>
