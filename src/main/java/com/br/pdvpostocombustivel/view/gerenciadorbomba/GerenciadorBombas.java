@@ -6,12 +6,17 @@ import org.springframework.stereotype.Component;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ItemEvent;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Component
 public class GerenciadorBombas {
@@ -51,9 +56,9 @@ public class GerenciadorBombas {
     public GerenciadorBombas(ApplicationContext context) {
         this.context = context;
         // Setup for each pump
-        setupPump(combB1, quantB1, preçoB1, preçoTotalB1);
-        setupPump(combB2, quantB2, preçoB2, preçoTotalB2);
-        setupPump(combB3, quantB3, preçoB3, PreçoTotalB3);
+        setupPump(combB1, quantB1, preçoB1, preçoTotalB1, PagB1);
+        setupPump(combB2, quantB2, preçoB2, preçoTotalB2, PagB2);
+        setupPump(combB3, quantB3, preçoB3, PreçoTotalB3, PagB3);
 
         // Set initial component states
         updateComponentsState(statusB1, combB1, quantB1, PagB1);
@@ -66,10 +71,33 @@ public class GerenciadorBombas {
         setupButtonListeners(INICIARATENDIMENTOButton, statusB3, combB3, quantB3, PagB3, PreçoTotalB3);
     }
 
-    private void setupPump(JComboBox<String> fuelCombo, JTextField quantityField, JLabel priceLabel, JLabel totalPriceLabel) {
+    private void setupPump(JComboBox<String> fuelCombo, JTextField quantityField, JLabel priceLabel, JLabel totalPriceLabel, JComboBox<String> paymentCombo) {
         priceLabel.setText(String.format("R$ %.2f", precosCombustiveis.get("GASOLINA")));
         totalPriceLabel.setText("R$ 0.00");
-        quantityField.setText("0");
+        quantityField.setText(""); // Set to empty
+
+        // Add document filter to allow only decimal numbers
+        ((AbstractDocument) quantityField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            private final Pattern regex = Pattern.compile("^\\d*\\.?\\d*$");
+
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newStr = new StringBuilder(currentText).insert(offset, string).toString();
+                if (regex.matcher(newStr).matches()) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newStr = new StringBuilder(currentText).replace(offset, offset + length, text).toString();
+                if (regex.matcher(newStr).matches()) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        });
 
         fuelCombo.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -119,6 +147,8 @@ public class GerenciadorBombas {
                 dialog.setLocationRelativeTo(panel1);
                 dialog.setVisible(true);
 
+                quantityField.setText(""); // Clear the quantity field to empty
+
                 nextStatus = "INATIVA";
                 nextButtonText = "INICIAR ATENDIMENTO";
             }
@@ -137,10 +167,15 @@ public class GerenciadorBombas {
     }
 
     private void updateTotalPrice(JComboBox<String> fuelCombo, JTextField quantityField, JLabel totalPriceLabel) {
+        String quantityText = quantityField.getText();
+        if (quantityText.isEmpty() || quantityText.equals(".")) {
+            totalPriceLabel.setText("R$ 0.00");
+            return;
+        }
         try {
             String selectedFuel = (String) fuelCombo.getSelectedItem();
             double pricePerLiter = precosCombustiveis.get(selectedFuel);
-            double quantity = Double.parseDouble(quantityField.getText());
+            double quantity = Double.parseDouble(quantityText);
             double totalPrice = pricePerLiter * quantity;
             totalPriceLabel.setText(String.format("R$ %.2f", totalPrice));
         } catch (NumberFormatException | NullPointerException ex) {
