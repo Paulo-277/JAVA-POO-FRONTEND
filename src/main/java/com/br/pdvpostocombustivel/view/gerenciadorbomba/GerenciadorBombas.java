@@ -42,52 +42,55 @@ public class GerenciadorBombas {
     );
 
     public GerenciadorBombas() {
-        // Initialize B2 components
-        preçoB2.setText(String.format("R$ %.2f", precosCombustiveis.get("GASOLINA")));
-        preçoTotalB2.setText("R$ 0.00");
-        quantB2.setText("0");
+        preparaBomba(combB1, quantB1, preçoB1, preçoTotalB1);
+        preparaBomba(combB2, quantB2, preçoB2, preçoTotalB2);
+        preparaBomba(combB3, quantB3, preçoB3, PreçoTotalB3);
+    }
 
-        combB2.addItemListener(e -> {
+    private void preparaBomba(JComboBox<String> tipoComb, JTextField quantidadeComb, JLabel precoComb, JLabel precoTotal) {
+        // Arumar valores iniciais
+        precoComb.setText(String.format("R$ %.2f", precosCombustiveis.get("GASOLINA")));
+        precoTotal.setText("R$ 0.00");
+        quantidadeComb.setText("0");
+
+        // Preparando a mudança de combustível
+        tipoComb.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                updatePriceB2();
-                updateTotalPriceB2();
+                updatePrice(tipoComb, precoComb);
+                updateTotalPrice(tipoComb, quantidadeComb, precoTotal);
             }
         });
 
-        quantB2.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
+        // Preparando a mudança nos campos de texto
+        quantidadeComb.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
-                updateTotalPriceB2();
+                updateTotalPrice(tipoComb, quantidadeComb, precoTotal);
             }
-
-            @Override
             public void removeUpdate(DocumentEvent e) {
-                updateTotalPriceB2();
+                updateTotalPrice(tipoComb, quantidadeComb, precoTotal);
             }
-
-            @Override
             public void changedUpdate(DocumentEvent e) {
-                updateTotalPriceB2();
+                updateTotalPrice(tipoComb, quantidadeComb, precoTotal);
             }
         });
     }
 
-    private void updatePriceB2() {
-        String selectedFuel = (String) combB2.getSelectedItem();
+    private void updatePrice(JComboBox<String> fuelCombo, JLabel priceLabel) {
+        String selectedFuel = (String) fuelCombo.getSelectedItem();
         if (selectedFuel != null) {
-            preçoB2.setText(String.format("R$ %.2f", precosCombustiveis.get(selectedFuel)));
+            priceLabel.setText(String.format("R$ %.2f", precosCombustiveis.get(selectedFuel)));
         }
     }
 
-    private void updateTotalPriceB2() {
+    private void updateTotalPrice(JComboBox<String> fuelCombo, JTextField quantityField, JLabel totalPriceLabel) {
         try {
-            String selectedFuel = (String) combB2.getSelectedItem();
+            String selectedFuel = (String) fuelCombo.getSelectedItem();
             double pricePerLiter = precosCombustiveis.get(selectedFuel);
-            double quantity = Double.parseDouble(quantB2.getText());
+            double quantity = Double.parseDouble(quantityField.getText());
             double totalPrice = pricePerLiter * quantity;
-            preçoTotalB2.setText(String.format("R$ %.2f", totalPrice));
-        } catch (NumberFormatException ex) {
-            preçoTotalB2.setText("R$ 0.00");
+            totalPriceLabel.setText(String.format("R$ %.2f", totalPrice));
+        } catch (NumberFormatException | NullPointerException ex) {
+            totalPriceLabel.setText("R$ 0.00");
         }
     }
 
